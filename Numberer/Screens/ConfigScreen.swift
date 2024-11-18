@@ -33,80 +33,139 @@ struct ConfigScreen: View {
     func handleDelete() {
         if appState.profiles.count > 1 {
             appState.profiles.remove(at: selected)
-            selected = selected >= appState.profiles.count ? selected - 1 : selected
+            selected =
+                selected >= appState.profiles.count ? selected - 1 : selected
         }
-        
+
     }
 
     var body: some View {
         NavigationStack {
-            VStack {
-                Picker("Profilo", selection: $selected) {
-                    ForEach(appState.profiles.indices, id: \.self) { index in
-                        let profile = appState.profiles[index]
-                        Text(
-                            profile.label
-                        ).tag(index)
-                    }
-                    Text("Nuovo profilo").tag(-1)
-                }.pickerStyle(.menu)
-                Divider()
+            ScrollView {
+
                 VStack {
-                    if selected == -1 {
-                        styled {
-                            VStack {
-                                TextField(
-                                    "Nome del nuovo profilo", text: $newName)
+                    Picker("Profilo", selection: $selected) {
+                        ForEach(appState.profiles.indices, id: \.self) {
+                            index in
+                            let profile = appState.profiles[index]
+                            Text(
+                                profile.label
+                            ).tag(index)
+                        }
+                        Text("Nuovo profilo").tag(-1)
+                    }.pickerStyle(.menu)
+                    Divider()
+                    VStack {
+                        if selected == -1 {
+                            styled {
+                                VStack {
+                                    TextField(
+                                        "Nome del nuovo profilo", text: $newName
+                                    )
+                                }
                             }
-                        }
-                        styled(background: .green) {
-                            Button(action: handleCreate) {
-                                Label("Crea profilo", systemImage: "check")
-                                    .foregroundColor(.white)
-                            }.frame(maxWidth: .infinity)
-                        }.padding(.top)
+                            styled(background: .green) {
+                                Button(action: handleCreate) {
+                                    Label("Crea profilo", systemImage: "plus")
+                                        .foregroundColor(.white).frame(
+                                            maxWidth: .infinity)
+                                }.frame(maxWidth: .infinity)
+                            }.padding(.top)
 
-                    } else {
-                        Picker(
-                            "Tipologia",
-                            selection: $appState.profiles[selected].type
-                        ) {
-                            Text("Singolo").tag(ProfileType.plain)
-                            Text("Slot").tag(ProfileType.roulette)
-                        }.pickerStyle(.segmented)
-                        styled {
+                        } else {
                             Picker(
-                                "Limite inferiore",
-                                selection: $appState.profiles[selected].lower
+                                "Tipologia",
+                                selection: $appState.profiles[selected].type
                             ) {
-                                ForEach(1..<101) { option in
-                                    Text("\(option)").tag(option)
-                                }
-                            }.pickerStyle(.navigationLink).foregroundStyle(.primary)
-                        }.padding(.top)
-                        styled {
-                            Picker(
-                                "Limite superiore",
-                                selection: $appState.profiles[selected].upper
-                            ) {
-                                ForEach(1..<101) { option in
-                                    Text("\(option)").tag(option)
-                                }
-                            }.pickerStyle(.navigationLink).foregroundStyle(.primary)
-                        }
-                        styled {
-                            Toggle("Escludi numeri già generati", isOn: $appState.profiles[selected].useExclude)
-                        }
-                        Spacer()
-                        styled(background: .red) {
-                            Button(action: handleDelete) {
-                                Label("Elimina profilo", systemImage: "check")
-                                    .foregroundColor(.white)
-                            }.frame(maxWidth: .infinity)
-                        }.padding(.top)
-                    }
+                                Text("Singolo").tag(ProfileType.plain)
+                                Text("Slot").tag(ProfileType.roulette)
+                            }.pickerStyle(.segmented)
 
-                }.frame(maxHeight: .infinity, alignment: .top).padding()
+                            if appState.profiles[selected].type == .plain {
+                                styled {
+                                    Picker(
+                                        "Limite inferiore",
+                                        selection: $appState.profiles[selected]
+                                            .lower
+                                    ) {
+                                        ForEach(1..<101) { option in
+                                            Text("\(option)").tag(option)
+                                        }
+                                    }.pickerStyle(.navigationLink)
+                                        .foregroundStyle(
+                                            .primary)
+                                }.padding(.top)
+                                styled {
+                                    Picker(
+                                        "Limite superiore",
+                                        selection: $appState.profiles[selected]
+                                            .upper
+                                    ) {
+                                        ForEach(1..<101) { option in
+                                            Text("\(option)").tag(option)
+                                        }
+                                    }.pickerStyle(.navigationLink)
+                                        .foregroundStyle(
+                                            .primary)
+                                }
+                                styled {
+                                    Toggle(
+                                        "Escludi numeri già generati",
+                                        isOn: $appState.profiles[selected]
+                                            .useExclude)
+                                }
+                                Spacer()
+                                styled(background: .red) {
+                                    Button(action: handleDelete) {
+                                        Label(
+                                            "Elimina profilo",
+                                            systemImage: "trash.fill"
+                                        )
+                                        .foregroundColor(.white)
+                                    }.frame(maxWidth: .infinity)
+                                }.padding(.top)
+                            } else {
+                                StringListPicker(
+                                    label: "Slot 1",
+                                    bucket: $appState.profiles[selected]
+                                        .buckets[
+                                            0]
+                                ).padding(.top)
+                                Divider()
+                                StringListPicker(
+                                    label: "Slot 2",
+                                    bucket: $appState.profiles[selected]
+                                        .buckets[
+                                            1]
+                                ).padding(.top)
+                                Divider()
+                                StringListPicker(
+                                    label: "Slot 3",
+                                    bucket: $appState.profiles[selected]
+                                        .buckets[
+                                            2]
+                                ).padding(.top)
+                                Divider()
+                                StringListPicker(
+                                    label: "Slot 4",
+                                    bucket: $appState.profiles[selected]
+                                        .buckets[
+                                            3]
+                                ).padding(.top)
+                                Divider()
+                                StringListPicker(
+                                    label: "Slot 5",
+                                    bucket: $appState.profiles[selected]
+                                        .buckets[
+                                            4]
+                                ).padding(.top)
+
+                            }
+
+                        }
+
+                    }.frame(maxHeight: .infinity, alignment: .top).padding()
+                }
             }
         }
     }

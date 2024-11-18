@@ -16,12 +16,12 @@ struct ProfilesScreen: View {
 
     var body: some View {
         NavigationSplitView {
-            List(appState.profiles, id: \.label) { profile in
+            List(appState.profiles, id: \.key) { profile in
                 NavigationLink {
                     if profile.type == .plain {
-                        PlainGeneratorScreen(profile)
+                        PlainGeneratorScreen(profile.key)
                     } else if profile.type == .roulette {
-                        RouletteGeneratorScreen(profile)
+                        RouletteGeneratorScreen(profile: profile)
                     }
                 } label: {
                     ProfileRow(profile: profile)

@@ -7,4 +7,8 @@
 
 import Foundation
 
+class PersistedState: Identifiable, Codable {
+    
+}
+
 class StatePersister {}

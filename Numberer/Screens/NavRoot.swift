@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct NavRoot: View {
+    
     var body: some View {
         TabView {
             ProfilesScreen().tabItem {
                 Label("Generatore", systemImage: "number")
             }
             
-            ConfigScreen().tabItem {
+            SettingsRoot().tabItem {
                 Label("Impostazioni", systemImage: "desktopcomputer")
             }
         }
@@ -22,5 +23,6 @@ struct NavRoot: View {
 }
 
 #Preview {
-    NavRoot()
+    @Previewable @StateObject var appState = AppState()
+    NavRoot().environmentObject(appState)
 }
