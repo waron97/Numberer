@@ -42,6 +42,7 @@ class Profile: Identifiable, Codable {
     var exclude: [Int]
     var useExclude: Bool
     var key: String
+    var presets: [String] = []
     var buckets: [Bucket] = [
         Bucket(
             presets: ["nums-0-10"],
