@@ -9,8 +9,10 @@ import SwiftUI
 
 struct ConfigScreen: View {
     @EnvironmentObject var appState: AppState
+    @Environment(\.dismiss) var dismiss
     @State private var selected: Int = 0
     @State private var newName: String = ""
+    @State private var cannotDeleteAlert = false
 
     func styled(background: Color = Color("PickerBg"), content: () -> some View)
         -> some View
@@ -35,8 +37,9 @@ struct ConfigScreen: View {
             appState.profiles.remove(at: selected)
             selected =
                 selected >= appState.profiles.count ? selected - 1 : selected
+        } else {
+            cannotDeleteAlert = true
         }
-
     }
 
     func renderNewProfile() -> some View {
@@ -55,7 +58,7 @@ struct ConfigScreen: View {
                             maxWidth: .infinity)
                 }.frame(maxWidth: .infinity)
             }.padding(.top)
-        }.padding()
+        }.frame(maxHeight: .infinity, alignment: .top).padding()
     }
 
     var body: some View {
@@ -88,7 +91,8 @@ struct ConfigScreen: View {
 
                             SingleGeneratorConfig(
                                 profile: $appState.profiles[selected],
-                                handleDelete: handleDelete).padding(.horizontal, 24)
+                                handleDelete: handleDelete
+                            ).padding(.horizontal, 24)
 
                         } else {
                             SlotGeneratorConfig(
@@ -96,8 +100,11 @@ struct ConfigScreen: View {
                                 handleDelete: handleDelete)
 
                         }
-
                     }
+                }.alert(
+                    "Devi avere almeno 1 profilo",
+                    isPresented: $cannotDeleteAlert
+                ) {
 
                 }
             }

@@ -65,6 +65,20 @@ struct PresetEditor: View {
         dismiss()
     }
 
+    func handleDelete(_ key: String) {
+        appState.presets.removeAll(where: { p in
+            return p.key == key
+        })
+        for profile in appState.profiles {
+            for bucket in profile.buckets {
+                bucket.presets.removeAll(where: { p in
+                    return p == key
+                })
+            }
+        }
+        dismiss()
+    }
+
     var body: some View {
         if presetKey == "" {
             PresetEditorItem(
@@ -73,8 +87,15 @@ struct PresetEditor: View {
 
         } else {
             let presetIdx = getPresetIndex()
-            let preset = $appState.presets[presetIdx]
-            PresetEditorItem(items: preset.items, name: preset.name)
+            if presetIdx >= 0 {
+                let preset = $appState.presets[presetIdx]
+                PresetEditorItem(
+                    items: preset.items, name: preset.name,
+                    onDelete: {
+                        handleDelete(preset.key.wrappedValue)
+                    })
+            }
+            
         }
 
     }

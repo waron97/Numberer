@@ -9,65 +9,56 @@ import SwiftUI
 
 struct RouletteGeneratorScreen: View {
     public var profile: Profile
-    @State var generatorStates: [GeneratorState] = [
-        .running, .running, .running, .running, .running,
-    ]
-    
-    func handleTap() {
-        let running = generatorStates.filter({state in
-            state == .running
-        })
-        
-        if running.count > 0 {
-            let firstRunning = generatorStates.firstIndex(where: { state in
-                state == .running
-            })
-            generatorStates[firstRunning!] = .stopped
-        } else {
-            generatorStates = [.running, .running, .running, .running, .running]
+    @EnvironmentObject var appState: AppState
+    @State private var generation: [String]? = nil
+
+    func generate() {
+        var partialGeneration: [String] = []
+        for i in 0...4 {
+            let options = GenerationUtils.getBucketOptions(
+                profile.buckets[i], appState)
+            if !options.isEmpty {
+                partialGeneration.append(options.randomElement()!)
+            }
         }
-        
+        withAnimation {
+            generation = partialGeneration
+        }
+
     }
 
     var body: some View {
         VStack {
-            if profile.buckets[0].customItems.count > 0 {
-                RouletteGenerator(
-                    bucket: profile.buckets[0], state: generatorStates[0])
-                Spacer()
+            if let gen = generation {
+                VStack {
+                    ForEach(gen.indices, id: \.self) { idx in
+                        let genned = gen[idx]
+                        Text(genned)
+                            .padding()
+                            .foregroundStyle(.white).fontWeight(.bold)
+                            .frame(width: 200)
+                            .background(
+                                Rectangle().fill(.blue).cornerRadius(20)
+                            )
+                    }
+                }.transition(.move(edge: .top))
             }
 
-            if profile.buckets[1].customItems.count > 0 {
-                RouletteGenerator(
-                    bucket: profile.buckets[1], state: generatorStates[1])
-                Spacer()
-            }
-
-            if profile.buckets[2].customItems.count > 0 {
-                RouletteGenerator(
-                    bucket: profile.buckets[2], state: generatorStates[2])
-                Spacer()
-            }
-
-            if profile.buckets[3].customItems.count > 0 {
-                RouletteGenerator(
-                    bucket: profile.buckets[3], state: generatorStates[3])
-                Spacer()
-            }
-
-            if profile.buckets[4].customItems.count > 0 {
-                RouletteGenerator(
-                    bucket: profile.buckets[4], state: generatorStates[4])
-            }
-        }.frame(maxWidth: .infinity, maxHeight: .infinity).padding(
-            .vertical, 200
-        ).background(.background).onTapGesture {
-            handleTap()
+            Button(action: generate) {
+                Label("Genera", systemImage: "repeat")
+                    .padding()
+                    .foregroundStyle(.white).fontWeight(.bold)
+                    .background(
+                        Rectangle().fill(.green).cornerRadius(20)
+                    )
+            }.labelStyle(.iconOnly).padding(.top, 24)
         }
     }
+
 }
 
 #Preview {
     var appState = AppState()
-    RouletteGeneratorScreen(profile: appState.profiles[0])
+    RouletteGeneratorScreen(profile: appState.profiles[0]).environmentObject(
+        appState)
 }

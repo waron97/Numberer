@@ -46,29 +46,19 @@ class Profile: Identifiable, Codable {
     var buckets: [Bucket] = [
         Bucket(
             presets: ["nums-0-10"],
-            customItems: [
-                "Emma", "Aron", "Italo", "Annalisa", "Mamma", "Francesco",
-            ]),
+            customItems: []),
         Bucket(
-            presets: [],
-            customItems: [
-                "Emma", "Aron", "Italo", "Annalisa", "Mamma", "Francesco",
-            ]),
+            presets: ["nums-0-10"],
+            customItems: []),
         Bucket(
-            presets: [],
-            customItems: [
-                "Emma", "Aron", "Italo", "Annalisa", "Mamma", "Francesco",
-            ]),
+            presets: ["nums-0-10"],
+            customItems: []),
         Bucket(
-            presets: [],
-            customItems: [
-                "Emma", "Aron", "Italo", "Annalisa", "Mamma", "Francesco",
-            ]),
+            presets: ["nums-0-10"],
+            customItems: []),
         Bucket(
-            presets: [],
-            customItems: [
-                "Emma", "Aron", "Italo", "Annalisa", "Mamma", "Francesco",
-            ]),
+            presets: ["nums-0-10"],
+            customItems: []),
     ]
 
     init(

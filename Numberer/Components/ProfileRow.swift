@@ -29,14 +29,6 @@ struct ProfileRow: View {
             Text(profile.label).fontWeight(.semibold).font(.system(size: 18))
             HStack {
                 Text(getType()).foregroundColor(muted)
-                Circle()
-                    .fill(muted)
-                    .frame(width: 6, height: 6)
-                Text("\(profile.lower)-\(profile.upper)").foregroundColor(muted)
-                Circle()
-                    .fill(muted)
-                    .frame(width: 6, height: 6)
-                Text("\(profile.exclude.count) esclusi").foregroundColor(muted)
             }
         }
     }

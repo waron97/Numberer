@@ -11,8 +11,10 @@ struct PresetEditorItem: View {
     @Binding public var items: [String]
     @Binding public var name: String
     public var onSave: (() -> Void)? = nil
+    public var onDelete: (() -> Void)? = nil
 
     @State private var newName: String = ""
+    @State private var isPresentingConfirm: Bool = false
 
     func handleAdd() {
         items.insert(newName, at: 0)
@@ -86,6 +88,26 @@ struct PresetEditorItem: View {
             ).labelStyle(.titleOnly)
         }.padding()
     }
+    
+    func renderDeleteButton() -> some View {
+        return VStack {
+            Button(action: {
+                isPresentingConfirm = true
+            }) {
+                Label("Elimina configurazione", systemImage: "check").fontWeight(
+                    .bold
+                ).foregroundStyle(.white)
+            }.frame(maxWidth: .infinity).frame(height: 48).background(
+                Rectangle().fill(.red).cornerRadius(20)
+            ).labelStyle(.titleOnly)
+        }.padding().confirmationDialog("Sei sicuro di voler procedere", isPresented: $isPresentingConfirm, actions: {
+            Button("Elimina preset", role: .destructive) {
+                onDelete!()
+            }
+        }, message: {
+            Text("Questa operazione è permanente")
+        })
+    }
 
     var body: some View {
         VStack {
@@ -97,6 +119,9 @@ struct PresetEditorItem: View {
             renderList()
             if onSave != nil {
                 renderSaveButton()
+            }
+            if onDelete != nil {
+                renderDeleteButton()
             }
         }
     }
