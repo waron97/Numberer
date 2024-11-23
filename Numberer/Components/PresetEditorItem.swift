@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct PresetEditorItem: View {
+    @Environment(\.scenePhase) var scenePhase
     @Binding public var items: [String]
     @Binding public var name: String
     public var onSave: (() -> Void)? = nil
@@ -16,14 +17,21 @@ struct PresetEditorItem: View {
     @State private var newName: String = ""
     @State private var isPresentingConfirm: Bool = false
 
+    @State private var canImportFromClipboard = false
+    @State private var importSheetOpen = false
+    @State private var clipboardString = ""
+
     func handleAdd() {
-        items.insert(newName, at: 0)
-        newName = ""
+        if newName != "" {
+            items.insert(newName, at: 0)
+            newName = ""
+        }
+        
     }
 
     func handleRemove(idx: Int) -> () -> Void {
         func doRemove() {
-            withAnimation {
+            _ = withAnimation {
                 items.remove(at: idx)
             }
         }
@@ -57,19 +65,16 @@ struct PresetEditorItem: View {
     }
 
     func renderList() -> some View {
-        return List {
-            ForEach(items.indices, id: \.self) { idx in
-                HStack {
-                    Text(items[idx]).frame(
-                        maxWidth: .infinity, alignment: .leading
-                    )
-
-                }.padding(.vertical, 12).frame(
+        return List($items, id: \.self, editActions: .delete) { $item in
+            HStack {
+                Text(item).frame(
                     maxWidth: .infinity, alignment: .leading
                 )
-            }.onDelete { indexSet in
-                items.remove(atOffsets: indexSet)
-            }
+
+            }.padding(.vertical, 12).frame(
+                maxWidth: .infinity, alignment: .leading
+            )
+
         }.frame(maxHeight: .infinity)
     }
 
@@ -88,41 +93,96 @@ struct PresetEditorItem: View {
             ).labelStyle(.titleOnly)
         }.padding()
     }
-    
+
     func renderDeleteButton() -> some View {
         return VStack {
             Button(action: {
                 isPresentingConfirm = true
             }) {
-                Label("Elimina configurazione", systemImage: "check").fontWeight(
-                    .bold
-                ).foregroundStyle(.white)
+                Label("Elimina configurazione", systemImage: "check")
+                    .fontWeight(
+                        .bold
+                    ).foregroundStyle(.white)
             }.frame(maxWidth: .infinity).frame(height: 48).background(
                 Rectangle().fill(.red).cornerRadius(20)
             ).labelStyle(.titleOnly)
-        }.padding().confirmationDialog("Sei sicuro di voler procedere", isPresented: $isPresentingConfirm, actions: {
-            Button("Elimina preset", role: .destructive) {
-                onDelete!()
+        }.padding().confirmationDialog(
+            "Sei sicuro di voler procedere", isPresented: $isPresentingConfirm,
+            actions: {
+                Button("Elimina preset", role: .destructive) {
+                    onDelete!()
+                }
+            },
+            message: {
+                Text("Questa operazione è permanente")
+            })
+    }
+
+    func checkClipboard() {
+        let pasteboard = UIPasteboard.general
+        if let string = pasteboard.string {
+            if GenerationUtils.stringConformsToCsv(string) {
+                canImportFromClipboard = true
             }
-        }, message: {
-            Text("Questa operazione è permanente")
-        })
+        }
+    }
+
+    func openImportModal() {
+        let pasteboard = UIPasteboard.general
+        if let string = pasteboard.string {
+            if GenerationUtils.stringConformsToCsv(string) {
+                importSheetOpen = true
+                clipboardString = string
+                print(string)
+            }
+        }
     }
 
     var body: some View {
-        VStack {
+        ZStack {
             VStack {
-                renderNameField()
-                Divider().padding(.vertical, 6)
-                renderNewField()
-            }.padding()
-            renderList()
-            if onSave != nil {
-                renderSaveButton()
+                VStack {
+                    renderNameField()
+                    Divider().padding(.vertical, 6)
+                    renderNewField()
+                }.padding()
+                renderList()
+                if onSave != nil {
+                    renderSaveButton()
+                }
+                if onDelete != nil {
+                    renderDeleteButton()
+                }
             }
-            if onDelete != nil {
-                renderDeleteButton()
+
+            if canImportFromClipboard {
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Button {
+                            openImportModal()
+                        } label: {
+                            Label("", systemImage: "clipboard.fill").labelStyle(
+                                .iconOnly
+                            ).foregroundStyle(.white)
+                        }.frame(width: 48, height: 48).background(
+                            Circle().fill(.orange)
+                        ).padding(.bottom, 60)
+                    }.padding()
+                }
             }
+        }
+
+        .onAppear {
+            checkClipboard()
+        }.onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                checkClipboard()
+            }
+        }.sheet(isPresented: $importSheetOpen) {
+            ClipboardImport(
+                selection: $items, open: $importSheetOpen)
         }
     }
 }

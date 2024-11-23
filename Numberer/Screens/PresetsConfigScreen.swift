@@ -18,7 +18,7 @@ struct PresetsConfigScreen: View {
                 Text("Nuova lista predefinita").fontWeight(.bold).frame(
                     maxWidth: .infinity
                 )
-                .frame(width: .infinity, height: 48).background(.green)
+                .frame(height: 48).background(.green)
                 .foregroundStyle(
                     .white
                 ).cornerRadius(20)
@@ -33,7 +33,7 @@ struct PresetsConfigScreen: View {
                     } label: {
                         Text(preset.name).fontWeight(.bold)
                             .frame(maxWidth: .infinity)
-                            .frame(width: .infinity, height: 48).background(
+                            .frame(height: 48).background(
                                 .blue
                             ).foregroundStyle(
                                 .white

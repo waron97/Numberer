@@ -82,15 +82,15 @@ class AppState: ObservableObject {
     init() {
         self.profiles = [
             Profile(
-                label: "Generatore", type: .roulette, lower: 1, upper: 20,
-                useExclude: true, exclude: [1, 2, 3])
+                label: "Profilo esempio", type: .plain, lower: 1, upper: 20,
+                useExclude: true, exclude: [])
         ]
         self.presets = [
             PresetList(
                 key: "nums-0-10",
                 items: [
                     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
-                ], name: "Numeri piccoli")
+                ], name: "Numeri 0-10")
         ]
     }
 }

@@ -98,7 +98,6 @@ struct ConfigScreen: View {
                             SlotGeneratorConfig(
                                 profile: $appState.profiles[selected],
                                 handleDelete: handleDelete)
-
                         }
                     }
                 }.alert(
@@ -108,7 +107,6 @@ struct ConfigScreen: View {
 
                 }
             }
-
         }
     }
 }

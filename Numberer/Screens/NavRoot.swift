@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct NavRoot: View {
+    @EnvironmentObject var appState: AppState
     
     var body: some View {
         TabView {

@@ -12,8 +12,9 @@ struct PresetEditor: View {
     @Environment(\.dismiss) var dismiss
 
     @State private var newName: String = ""
-    @State private var newItems: [String] = ["Hello", "Goodbye"]
+    @State private var newItems: [String] = []
     @State private var toast: Toast? = nil
+    
 
     var presetKey: String
 
@@ -24,7 +25,7 @@ struct PresetEditor: View {
     func handleRemove(idx: Int) -> () -> Void {
         func doRemove() {
             if presetKey == "" {
-                withAnimation {
+                let _ = withAnimation {
                     newItems.remove(at: idx)
                 }
             } else {
@@ -95,7 +96,7 @@ struct PresetEditor: View {
                         handleDelete(preset.key.wrappedValue)
                     })
             }
-            
+
         }
 
     }

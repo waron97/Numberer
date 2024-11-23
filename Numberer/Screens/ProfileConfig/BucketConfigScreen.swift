@@ -11,6 +11,7 @@ struct BucketConfigScreen: View {
     @Binding var bucket: Bucket
     @EnvironmentObject var appState: AppState
     @State private var newName: String = ""
+    
 
     private struct PresetSelector: View {
         @Binding var presets: [String]
@@ -66,6 +67,8 @@ struct BucketConfigScreen: View {
             }
         }
     }
+    
+    
 
     var body: some View {
         List {
