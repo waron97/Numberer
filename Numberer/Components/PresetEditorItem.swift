@@ -17,16 +17,15 @@ struct PresetEditorItem: View {
     @State private var newName: String = ""
     @State private var isPresentingConfirm: Bool = false
 
-    @State private var canImportFromClipboard = false
     @State private var importSheetOpen = false
-    @State private var clipboardString = ""
+    @State private var noContentAlert = false
 
     func handleAdd() {
         if newName != "" {
             items.insert(newName, at: 0)
             newName = ""
         }
-        
+
     }
 
     func handleRemove(idx: Int) -> () -> Void {
@@ -118,23 +117,12 @@ struct PresetEditorItem: View {
             })
     }
 
-    func checkClipboard() {
-        let pasteboard = UIPasteboard.general
-        if let string = pasteboard.string {
-            if GenerationUtils.stringConformsToCsv(string) {
-                canImportFromClipboard = true
-            }
-        }
-    }
-
     func openImportModal() {
         let pasteboard = UIPasteboard.general
-        if let string = pasteboard.string {
-            if GenerationUtils.stringConformsToCsv(string) {
-                importSheetOpen = true
-                clipboardString = string
-                print(string)
-            }
+        if let _ = pasteboard.string {
+            importSheetOpen = true
+        } else {
+            noContentAlert = true
         }
     }
 
@@ -155,34 +143,24 @@ struct PresetEditorItem: View {
                 }
             }
 
-            if canImportFromClipboard {
-                VStack {
+            VStack {
+                Spacer()
+                HStack {
                     Spacer()
-                    HStack {
-                        Spacer()
-                        Button {
-                            openImportModal()
-                        } label: {
-                            Label("", systemImage: "clipboard.fill").labelStyle(
-                                .iconOnly
-                            ).foregroundStyle(.white)
-                        }.frame(width: 48, height: 48).background(
-                            Circle().fill(.orange)
-                        ).padding(.bottom, 60)
-                    }.padding()
-                }
-            }
-        }
-
-        .onAppear {
-            checkClipboard()
-        }.onChange(of: scenePhase) { _, phase in
-            if phase == .active {
-                checkClipboard()
+                    Button {
+                        openImportModal()
+                    } label: {
+                        Label("", systemImage: "clipboard.fill").labelStyle(
+                            .iconOnly
+                        ).foregroundStyle(.white)
+                    }.frame(width: 48, height: 48).background(
+                        Circle().fill(.orange)
+                    ).padding(.bottom, 60)
+                }.padding()
             }
         }.sheet(isPresented: $importSheetOpen) {
             ClipboardImport(
                 selection: $items, open: $importSheetOpen)
-        }
+        }.alert("Nessun testo trovato negli appunti", isPresented: $noContentAlert) {}
     }
 }
